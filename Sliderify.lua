@@ -9,28 +9,40 @@
 		[Options] {
 			max: number;
 			min: number;
-			prefix: string (example: "%4")
+			prefix: string (example how it will look like: "%<number>")
 		};
 		[Callback]: (any) -> number
 	)
+	sliderify(
+		script.Parent.Parent,
+		script.Parent,
+		script.Parent.Parent.TextLabel,
+		{
+			min = 1,
+			max = 9,
+			prefix = "%"
+		},
+		function(callback)
+			warn(callback) --//example: 7
+		end
+)
 --]]
 local lp = game:GetService("Players").LocalPlayer
 local mos = lp:GetMouse()
-local function sliderify(slidingFrame, slidingBar, options, callback)
+local getgenv = getgenv or getfenv or function() return _ENV end
+local function sliderify(parentBar, slidingBar, Label, options, callback)
 	local api = {}
 	local options = options or {
 		min = 1,
 		max = 12,
 		prefix = "Value: "
 	}
-	local factor = 1
 	if not options.prefix then
 		options.prefix = "Value: "
 	end
 	local slidingBar = slidingBar
 	local Value = 0
-	local parentBar = slidingFrame
-	local Label = Label
+	local Label = Label or {Text = "none;"}
 	local sliding = false
 	task.spawn(function()
 		parentBar.InputBegan:Connect(function(input)
@@ -38,10 +50,8 @@ local function sliderify(slidingFrame, slidingBar, options, callback)
 				sliding = true
 				while sliding do
 					local v1 = math.clamp((mos.X - parentBar.AbsolutePosition.X) / (parentBar.AbsoluteSize.X), 0, 1)
-					--local v2 = math.floor((((options.max - options.min) * v1) + options.min))
-					--local v2 = math.floor(((options.max - options.min) * v1) + options.min) - factor / factor
 					local v2 = math.round((options.min + (options.max - options.min) * v1))
-					v2 = math.clamp(v2 * factor, options.min, options.max) / factor
+					v2 = math.clamp(v2, options.min, options.max)
 					Value = v2
 					Label.Text = tostring(v2)
 					slidingBar.Size = UDim2.fromScale(v1, 1)
