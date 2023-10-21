@@ -27,10 +27,13 @@
 		end
 )
 --]]
+--//vars
 local lp = game:GetService("Players").LocalPlayer
 local mos = lp:GetMouse()
 local getgenv = getgenv or getfenv or function() return _ENV end
+--//function
 local function sliderify(parentBar, slidingBar, Label, options, callback)
+	--//vars
 	local api = {}
 	local options = options or {
 		min = 1,
@@ -44,17 +47,21 @@ local function sliderify(parentBar, slidingBar, Label, options, callback)
 	local Value = 0
 	local Label = Label or {Text = "none;"}
 	local sliding = false
+	--//main hitbox check
 	task.spawn(function()
 		parentBar.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 then
 				sliding = true
 				while sliding do
+					--//calculations
 					local v1 = math.clamp((mos.X - parentBar.AbsolutePosition.X) / (parentBar.AbsoluteSize.X), 0, 1)
 					local v2 = math.round((options.min + (options.max - options.min) * v1))
 					v2 = math.clamp(v2, options.min, options.max)
+					--//setup the new slider calues
 					Value = v2
 					Label.Text = tostring(v2)
 					slidingBar.Size = UDim2.fromScale(v1, 1)
+					--//wait a bit so the game doesn't crash
 					game:GetService("RunService").RenderStepped:Wait()
 				end
 				sliding = false
